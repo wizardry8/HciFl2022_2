@@ -2,7 +2,7 @@
     "Input File" : "split1.csv",
     "Output File" : "output.csv",
     "Percentage" : 0.80,
-    "N_samples" : 2000,
+    "N_samples" : 10,
     "Features" : {
         "Cancer Type Detailed" : ["categorical", ""], 
         "Mutation Count" : ["numerical", "integer"],

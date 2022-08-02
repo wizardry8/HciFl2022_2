@@ -126,12 +126,13 @@ class Client:
 
         #print("DBF101: ",self.syn_new_data)
 
-        self.syn_new_data.to_csv(self.syn_target_file, index=False)
+        ###self.syn_new_data.to_csv(self.syn_target_file, index=False)
 
         
         #convert data frame to json
         dataframe_as_json = self.syn_new_data.to_json(orient="split")
         self.syn_new_data = dataframe_as_json
+        ##self.syn_new_data = self.syn_new_data.to_csv(self.syn_target_file, index=False)
 
         #taking only one cell doesnt crash the program
         #self.syn_new_data = self.syn_new_data.iloc[0]
@@ -169,17 +170,35 @@ class Client:
         self.global_mean = global_mean
 
     def write_results(self, output_path):
-        #f = open(output_path, "a")
-        f = open("krekirolle.txt","a")
-        print("dbf graue, len list: ", len(self.syn_global_data))
-        #print(self.syn_global_data)        
-        f.write(str(self.syn_global_data))
-        f.close()
-        for x in self.syn_global_data:
-            print("x")
         
-        df = pd.DataFrame(self.syn_global_data)
-        print(df)
+        df = pd.DataFrame(self.syn_global_data[0])
+        df_str = df.to_string()
+        print("DBF149 df to string: ",df_str)
+
+        '''
+        #f = open(output_path, "a")
+        f = open("krekirolle7.txt","a")
+        #print("dbf graue, len list: ", len(self.syn_global_data))
+        #print("DBF150: ",self.syn_global_data)        
+        #f.write(self.syn_global_data[0].to_string())
+        f.write(df_str)
+        f.close()
+        '''
+        
+        #for x in self.syn_global_data:
+        #    print("x")
+        
+
+        # pd.set_option('display.max_rows', None)
+        # pd.set_option('display.max_columns', None)
+        # pd.set_option('display.width', None)
+        # pd.set_option('display.max_colwidth', None)
+
+        #pd.set_option('display.expand_frame_repr', False)
+        
+        #df = pd.DataFrame(self.syn_global_data[0])
+        #pd.set_option('display.max_colwidth', None)
+        #print(df)
 
         ##print(self.syn_global_data)
         print("erdbeer katze")

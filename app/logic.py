@@ -155,7 +155,7 @@ class AppLogic:
             if state == state_wait_for_aggregation:
                 print("Wait for aggregation", flush=True)
                 self.progress = 'wait for aggregation'
-                if len(self.data_incoming) > 0:
+                if len(self.data_incoming) > 0: ##LR: TODO: adapt this to syn
                     print("Received global mean from coordinator.", flush=True)
                     global_mean = jsonpickle.decode(self.data_incoming[0])
                     self.data_incoming = []
@@ -175,9 +175,14 @@ class AppLogic:
                     #local_syn_data_for_global_part = [data_for_global for data_for_global in self.data_incoming] ##LR: before changing to pickle again
                     print("DBF244: datatype before decode: ", type(self.data_incoming))
                     print("J")
-                    local_syn_data_for_global_part = [jsonpickle.decode(data_for_global) for data_for_global in self.data_incoming]
+                    ##local_syn_data_for_global_part_temp = [jsonpickle.decode(data_for_global) for data_for_global in self.data_incoming]
+                    local_syn_data_for_global_part = [pd.read_json(jsonpickle.decode(data_for_global),orient="split") for data_for_global in self.data_incoming]
                     #print("DBF590,5: local_syn_data_for_global_part datatype/length: ", type(local_syn_data_for_global_part),"/",len(local_syn_data_for_global_part))
-                    print("K")                    
+                    print("K") 
+                    
+                    #pd.read_json(exp_data_unpickled,orient="split") #LR: just reference for pd.read_json, delete later
+                    #print("len temp: ", len(local_syn_data_for_global_part_temp))
+                    #local_syn_data_for_global_part = pd.read_json(local_syn_data_for_global_part_temp[0],orient="split")              
                     self.data_incoming = []
                     #global_mean = self.client.compute_global_mean(local_means) #LR: original code
                     #print("DBF 591: local_syn_data_for_global_part (aka local syn data: ", local_syn_data_for_global_part)
@@ -195,6 +200,7 @@ class AppLogic:
 
                     print("O")
                     self.status_available = True
+                    print("data out: ", self.data_outgoing)
                     print("R")
                     state = state_writing_results
                     print(f'[COORDINATOR] Broadcasting global mean to clients', flush=True)
@@ -210,7 +216,7 @@ class AppLogic:
                 self.progress = 'finishing...'
                 if self.coordinator:
                     time.sleep(10)
-                #self.status_finished = True
+                #self.status_finished = True  ##LR: IMPORTANT REMOVE THIS BEFORE RUNNING FINAL TESTS THIS IS JUST TO PREVENT APP FROM CLOSING
                 #break
 
             time.sleep(1)
