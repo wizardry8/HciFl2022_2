@@ -1,0 +1,10 @@
+Study ID,Patient ID,Sample ID,Cancer Type Detailed,Mutation Count,Oncotree Code,Overall Survival (Months),Overall Survival Status,Number of Samples Per Patient,Sample Type,Sex
+gbm_mayo_pdx_sarkaria_2019,Mayo-PDX-Sarkaria-10,Mayo-PDX-Sarkaria-10,Glioblastoma Multiforme,173,GBM,30,1:DECEASED,1,Recurrence,Male
+gbm_mayo_pdx_sarkaria_2019,Mayo-PDX-Sarkaria-102,Mayo-PDX-Sarkaria-102,Glioblastoma Multiforme,1756,GBM,21,1:DECEASED,1,Recurrence,Male
+gbm_mayo_pdx_sarkaria_2019,Mayo-PDX-Sarkaria-108,Mayo-PDX-Sarkaria-108,Glioblastoma Multiforme,158,GBM,8.04,1:DECEASED,1,Primary,Male
+gbm_mayo_pdx_sarkaria_2019,Mayo-PDX-Sarkaria-110,Mayo-PDX-Sarkaria-110,Glioblastoma Multiforme,161,GBM,25.92,1:DECEASED,1,Primary,Female
+gbm_mayo_pdx_sarkaria_2019,Mayo-PDX-Sarkaria-114,Mayo-PDX-Sarkaria-114,Glioblastoma Multiforme,669,GBM,44.88,1:DECEASED,1,Recurrence,Male
+gbm_mayo_pdx_sarkaria_2019,Mayo-PDX-Sarkaria-115,Mayo-PDX-Sarkaria-115,Glioblastoma Multiforme,132,GBM,4.08,1:DECEASED,1,Primary,Female
+gbm_mayo_pdx_sarkaria_2019,Mayo-PDX-Sarkaria-116,Mayo-PDX-Sarkaria-116,Glioblastoma Multiforme,139,GBM,10.44,1:DECEASED,1,Primary,Female
+gbm_mayo_pdx_sarkaria_2019,Mayo-PDX-Sarkaria-117,Mayo-PDX-Sarkaria-117,Glioblastoma Multiforme,151,GBM,9.72,1:DECEASED,1,Primary,Male
+gbm_mayo_pdx_sarkaria_2019,Mayo-PDX-Sarkaria-118,Mayo-PDX-Sarkaria-118,Glioblastoma Multiforme,79,GBM,24.24,1:DECEASED,1,Primary,Female

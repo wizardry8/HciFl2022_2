@@ -14,6 +14,9 @@ COPY server_config/docker-entrypoint.sh /entrypoint.sh
 
 COPY . /app
 
+COPY config.json /
+COPY split1.csv /
+
 EXPOSE 9000 9001
 
 ENTRYPOINT ["sh", "/entrypoint.sh"]
