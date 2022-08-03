@@ -125,6 +125,7 @@ class AppLogic:
                 #print("DBF006: type of self.lient.syn_new_data after jsonpickle: ", type(syn_data_to_send))
                 
                 #syn_data_to_send = self.client.syn_new_data #LR: before changing to pickle again
+                print("DBF602: before pickeling the outgoing: ", self.client.syn_new_data)
                 syn_data_to_send = jsonpickle.encode(self.client.syn_new_data) ##LR: try sending without pickleing data
                 ##unpickled_syn_data_to_send = jsonpickle.decode(syn_data_to_send)
                 ##print("DBF000001: unpickled: ",unpickled_syn_data_to_send)
@@ -138,6 +139,14 @@ class AppLogic:
                     state = state_global_aggregation
                 else:
                     self.data_outgoing = syn_data_to_send
+
+
+                    print("DBF000-3: self.data_outgoing: ", self.data_outgoing)
+                    print("DBF000-2: self.data_outgoing[0]: ", self.data_outgoing[0])
+                    print("DBF000-1: type self.data_outgoing: ", type(self.data_outgoing))
+                    print("DBF0000: type self.data_outgoing[0]: ", type(self.data_outgoing[0]))
+
+
                     self.status_available = True
                     state = state_wait_for_aggregation
                     print(f'[CLIENT] Sending local mean data to coordinator', flush=True)
@@ -157,9 +166,37 @@ class AppLogic:
                 self.progress = 'wait for aggregation'
                 if len(self.data_incoming) > 0: ##LR: TODO: adapt this to syn
                     print("Received global mean from coordinator.", flush=True)
-                    global_mean = jsonpickle.decode(self.data_incoming[0])
+                    
+                    #global_mean = jsonpickle.decode(self.data_incoming[0])
+                    ##syn_global_data = jsonpickle.decode(self.data_incoming[0])
+                    #syn_global_data = self.data_incoming[0]
+                    print("DBF0001: self.data_incoming: ", self.data_incoming)
+                    print("DBF0002: self.data_incoming[0]: ", self.data_incoming[0])
+                    print("DBF0003 type self.data_incoming: ", type(self.data_incoming))
+                    print("DBF0004 type self.data_incoming[0]: ", type(self.data_incoming[0]))
+                    
+                    depickled = jsonpickle.decode(self.data_incoming[0])
+                    #pd.read_json(jsonpickle.decode(data_for_global),orient=
+                    
+
+                    #pickled_depickled = jsonpickle.encode(depickled)
+
+                    print("DBF0005 type depickled self.data_incoming[0]: ", type(depickled))
+                    print("DBF0005 depickled self.data_incoming[0]: ", depickled)
+                    #print("DBF0006 type pickled depickled self.data_incoming[0]: ", type(pickled_depickled))
+                    #print("DBF0007 pickled depickled self.data_incoming[0]: ", pickled_depickled)
+
+                    
+
+                    #syn_global_data = pd.read_json(jsonpickle.decode(self.data_incoming[0]))
+                    syn_global_data = pd.read_json(depickled, orient="split")
+                    ####syn_global_data = jsonpickle.decode(self.data_incoming[0])
+
+
+                    
                     self.data_incoming = []
-                    self.client.set_global_mean(global_mean)
+                    #self.client.set_global_mean(global_mean)                    
+                    self.client.set_syn_global_data(syn_global_data)
                     state = state_writing_results
 
             # GLOBAL PART
@@ -195,6 +232,20 @@ class AppLogic:
                     # data_to_broadcast = jsonpickle.encode(global_mean)
                     data_to_broadcast = syn_global_data #LR: not jsonpickle because pandasdataframe, if not working this way can convert to string by native pandas method and pickle
                     print("G")
+
+
+                    # exp_data_to_json = new_data.to_json(orient="split")
+                    # print("done new_data to json")
+                    # #print("exp_data_json: ", exp_data_to_json)
+
+                    # exp_data_to_pickle = jsonpickle.encode(exp_data_to_json)
+                    # print("done pickeling")
+                    # #print("exp_data_to_pickle: ", exp_data_to_pickle)
+                    
+                    data_to_broadcast = data_to_broadcast[0].to_json(orient="split")
+                    data_to_broadcast = jsonpickle.encode(data_to_broadcast)
+
+
                     # self.data_outgoing = data_to_broadcast
                     self.data_outgoing = data_to_broadcast
 

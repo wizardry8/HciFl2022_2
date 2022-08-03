@@ -171,20 +171,56 @@ class Client:
 
     def write_results(self, output_path):
         
-        df = pd.DataFrame(self.syn_global_data[0])
-        df_str = df.to_string()
-        print("DBF149 df to string: ",df_str)
+        Client_or_Coordinator = self.__class__.__name__
 
-        '''
-        #f = open(output_path, "a")
-        f = open("krekirolle7.txt","a")
-        #print("dbf graue, len list: ", len(self.syn_global_data))
-        #print("DBF150: ",self.syn_global_data)        
-        #f.write(self.syn_global_data[0].to_string())
-        f.write(df_str)
-        f.close()
-        '''
+        if(isinstance(self.syn_global_data,list)):
+            print("DBF143 found list, len: ",len(self.syn_global_data))
+            print("DBF144 type of syn_global_data", type(self.syn_global_data))
+            print("DBF145 type of syn_global_data[0]", type(self.syn_global_data[0]))
+            print("DBF146 syn_global_data", self.syn_global_data)
+            print("DBF147 syn_global_data[0]", self.syn_global_data[0])
+
+            #df = pd.DataFrame(self.syn_global_data[0])
+            #df_str = df.to_string()
+            #print("DBF148 df to string: ",df_str)
+
+            df_concatenated = pd.concat(self.syn_global_data)
+            df_str = df_concatenated.to_string()
+            
+        if(isinstance(self.syn_global_data,pd.DataFrame)):
+            df = pd.DataFrame(self.syn_global_data)
+            df_str = df.to_string()
+            print("DBF149 df to string: ",df_str)
+
+
+        #print("DBF144 type of syn_global_data", type(self.syn_global_data))
+        #print("DBF145 type of syn_global_data[0]", type(self.syn_global_data[0]))
+        #print("DBF146 syn_global_data", self.syn_global_data)
+        #print("DBF147 syn_global_data[0]", self.syn_global_data[0])
+
+
+        #df = pd.DataFrame(self.syn_global_data[0])
+        #df_str = df.to_string()
+        #print("DBF148 df to string: ",df_str)
+
+        if(Client_or_Coordinator == "Coordinator"):
+            try:
+                print("Coordinator is writing file", df_str)
+                #f = open(output_path, "a")
+                f = open("krekirolle10.txt","a")
+                #print("dbf graue, len list: ", len(self.syn_global_data))
+                #print("DBF150: ",self.syn_global_data)        
+                #f.write(self.syn_global_data[0].to_string())
+                f.write(df_str)
+                f.close()
+
+            except:
+                print("Error writing file")    
+
+
         
+
+
         #for x in self.syn_global_data:
         #    print("x")
         
