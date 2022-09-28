@@ -35,7 +35,18 @@ class Client:
     def __init__(self):
         pass
 
-    def read_input(self, input_path):
+    def read_input(self, input_path): 
+
+        #Identify who is the current owner of the virtual directory by writing an id file to it.   
+        Client_or_Coordinator = self.__class__.__name__
+        if(Client_or_Coordinator == "Coordinator"):
+            with open('flCoordinator.txt', 'w') as f:
+                f.write('flCoordinator')
+        else:
+            with open('flNotCoordinator.txt', 'w') as f:
+                f.write('flNotCoordinator')           
+        #End identification.                 
+
         try:
             print("DBF11 current wd: ",os.getcwd())
             #self.input_data = pd.read_csv(input_path, header=None)""
@@ -43,7 +54,7 @@ class Client:
             self.syn_config = pd.read_json("/config.json") #config file(dictionary)
             print("DBF13 found json")
             self.syn_data_file = self.syn_config["Input File"][0]
-            print("DBF14 opened data file")
+            print("DBF14 opened data file with name: ", self.syn_data_file)
             #print(syn_data_file)
             self.syn_target_file = self.syn_config["Output File"][0]
             self.syn_data = pd.read_csv(str(self.syn_data_file))
@@ -120,6 +131,7 @@ class Client:
 
         self.syn_model.fit(self.syn_data)
 
+        #Is here where the data gets pruned to size of "N_samples" parameter from "config.json"?
         self.syn_new_data = self.syn_model.sample(num_rows=self.syn_number_of_samples)
 
         self.syn_new_data = self.syn_new_data.round(decimals = 2)        
@@ -141,7 +153,8 @@ class Client:
         #print("DBF102: ",self.syn_new_data, flush=True) #printing the json dataframe seems to crash the console
 
         #print("The generated data is", "{:.2%}".format(evaluate(self.syn_new_data, self.syn_validation_set, metrics=['KSTest'])), "accurate to the original data. If this is unsatisfactory try using less or different features, more data or removing more NaNs.")
-
+        Client_or_Coordinator = self.__class__.__name__
+        print(Client_or_Coordinator , " local synthetization results: ", self.syn_new_data)
         print("DBF17 done synthetization")
 
     def aggregate_syn_global_data(self, local_syn_data):
@@ -159,7 +172,7 @@ class Client:
         self.syn_global_data = syn_global_data
 
     def compute_local_mean(self):
-        print("DBF15 trying compute local mean")
+        print("DBF15 not trying compute local mean, this has no effect")
         self.number_of_samples = self.input_data.shape[1]
         self.local_sum = self.input_data.to_numpy().sum()
         print(f'Local sum: {self.local_sum}', flush=True)
@@ -173,12 +186,65 @@ class Client:
         
         Client_or_Coordinator = self.__class__.__name__
 
+        print("DBF147: type of splinter of param: ", type(self.syn_global_data[0]))
+        print("DBF148: type of whole param: ", type(self.syn_global_data))
+
+        df_str = ""
+
+        if(Client_or_Coordinator == "Coordinator"):
+            list_to_concat = []
+            for i in self.syn_global_data:
+                #print("this is plein i: ", i)
+                #print("this is unjson i: ", pd.read_json(jsonpickle.decode(i),orient="split"))
+                #print("type of unjson i: ", type(pd.read_json(jsonpickle.decode(i),orient="split")))
+                data_frame_segment = pd.read_json(jsonpickle.decode(i),orient="split")
+                list_to_concat.append(data_frame_segment)           
+            
+            concatenated = pd.concat(list_to_concat)
+            
+
+            print("DBF149: conc pdf: ", concatenated)
+
+            df_str = concatenated.to_string()
+
+            self.syn_global_data = df_str
+
+            #self.syn_global_data = concaten_ated
+
+        elif(Client_or_Coordinator == "Coordinator"):
+            df_str = self.syn_global_data.to_string()
+
+
+
+
+        """   
+        list_to_concat = []
+        for i in self.syn_global_data:
+            #print("this is plein i: ", i)
+            #print("this is unjson i: ", pd.read_json(jsonpickle.decode(i),orient="split"))
+            #print("type of unjson i: ", type(pd.read_json(jsonpickle.decode(i),orient="split")))
+            data_frame_segment = pd.read_json(jsonpickle.decode(i),orient="split")
+            list_to_concat.append(data_frame_segment)           
+        
+        concatenated = pd.concat(list_to_concat)
+        
+
+        print("DBF149: conc pdf: ", concatenated)
+
+        df_str = concatenated.to_string()
+
+        self.syn_global_data = df_str
+
+        #self.syn_global_data = concaten_ated
+        """
+
+        """
         if(isinstance(self.syn_global_data,list)):
-            print("DBF143 found list, len: ",len(self.syn_global_data))
-            print("DBF144 type of syn_global_data", type(self.syn_global_data))
-            print("DBF145 type of syn_global_data[0]", type(self.syn_global_data[0]))
-            print("DBF146 syn_global_data", self.syn_global_data)
-            print("DBF147 syn_global_data[0]", self.syn_global_data[0])
+            #print("DBF143 found list, len: ",len(self.syn_global_data))
+            #print("DBF144 type of syn_global_data", type(self.syn_global_data))
+            #print("DBF145 type of syn_global_data[0]", type(self.syn_global_data[0]))
+            #print("DBF146 syn_global_data", self.syn_global_data)
+            #print("DBF147 syn_global_data[0]", self.syn_global_data[0])
 
             #df = pd.DataFrame(self.syn_global_data[0])
             #df_str = df.to_string()
@@ -190,8 +256,8 @@ class Client:
         if(isinstance(self.syn_global_data,pd.DataFrame)):
             df = pd.DataFrame(self.syn_global_data)
             df_str = df.to_string()
-            print("DBF149 df to string: ",df_str)
-
+            #print("DBF149 df to string: ",df_str)
+        """
 
         #print("DBF144 type of syn_global_data", type(self.syn_global_data))
         #print("DBF145 type of syn_global_data[0]", type(self.syn_global_data[0]))
@@ -203,11 +269,22 @@ class Client:
         #df_str = df.to_string()
         #print("DBF148 df to string: ",df_str)
 
+
+        print("DBF00347: write_results param is of type: ", type(self.syn_global_data))
+
+
+        #Writing synthesized data to console
+        if(df_str is not None):
+            print(Client_or_Coordinator, " results: ", df_str)
+
+
+
+
         if(Client_or_Coordinator == "Coordinator"):
             try:
                 print("Coordinator is writing file", df_str)
                 #f = open(output_path, "a")
-                f = open("krekirolle10.txt","a")
+                f = open("krekirolle11.txt","a")
                 #print("dbf graue, len list: ", len(self.syn_global_data))
                 #print("DBF150: ",self.syn_global_data)        
                 #f.write(self.syn_global_data[0].to_string())
@@ -237,7 +314,7 @@ class Client:
         #print(df)
 
         ##print(self.syn_global_data)
-        print("erdbeer katze")
+        print("DBF 150: done writing results to file")
 
 
 class Coordinator(Client):

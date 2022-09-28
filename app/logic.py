@@ -63,6 +63,10 @@ class AppLogic:
         self.data_incoming.append(data.read())
 
     def handle_outgoing(self):
+        print("DBF9519: he is processing outgoing data: ", self.__class__.__name__)
+        print("DBF9520: the outgoing data is: ", self.data_outgoing)
+        print("DBF9521: the type of outgoing data is: ", type(self.data_outgoing))
+
         print("Process outgoing data...", flush=True)
         # This method is called when data is requested
         self.status_available = False
@@ -140,7 +144,6 @@ class AppLogic:
                 else:
                     self.data_outgoing = syn_data_to_send
 
-
                     print("DBF000-3: self.data_outgoing: ", self.data_outgoing)
                     print("DBF000-2: self.data_outgoing[0]: ", self.data_outgoing[0])
                     print("DBF000-1: type self.data_outgoing: ", type(self.data_outgoing))
@@ -167,6 +170,7 @@ class AppLogic:
                 if len(self.data_incoming) > 0: ##LR: TODO: adapt this to syn
                     print("Received global mean from coordinator.", flush=True)
                     
+                    """
                     #global_mean = jsonpickle.decode(self.data_incoming[0])
                     ##syn_global_data = jsonpickle.decode(self.data_incoming[0])
                     #syn_global_data = self.data_incoming[0]
@@ -191,8 +195,9 @@ class AppLogic:
                     #syn_global_data = pd.read_json(jsonpickle.decode(self.data_incoming[0]))
                     syn_global_data = pd.read_json(depickled, orient="split")
                     ####syn_global_data = jsonpickle.decode(self.data_incoming[0])
+                    """
 
-
+                    syn_global_data = self.data_incoming
                     
                     self.data_incoming = []
                     #self.client.set_global_mean(global_mean)                    
@@ -201,9 +206,46 @@ class AppLogic:
 
             # GLOBAL PART
             if state == state_global_aggregation:
+
+                #This method actually computes the global mean and hands it back to clients, this is not relevant for data synthetization algorighm     
+
                 print("Global computation", flush=True)
                 self.progress = 'global aggregation...'
                 
+                if len(self.data_incoming) == len(self.clients):
+
+                    self.data_outgoing = self.data_incoming
+                    self.client.set_syn_global_data(self.data_outgoing)
+                
+                    #self.client.set_syn_global_data(self.data_incoming)
+
+
+
+
+                    list_to_concat = []
+                    for i in self.data_incoming:
+                        #print("this is plein i: ", i)
+                        #print("this is unjson i: ", pd.read_json(jsonpickle.decode(i),orient="split"))
+                        #print("type of unjson i: ", type(pd.read_json(jsonpickle.decode(i),orient="split")))
+                        data_frame_segment = pd.read_json(jsonpickle.decode(i),orient="split")
+                        list_to_concat.append(data_frame_segment)           
+                    
+                    concatenated = pd.concat(list_to_concat)                    
+
+                    print("DBF149: conc pdf: ", concatenated)
+
+                    df_str = concatenated.to_string()
+
+                    self.data_outgoing = df_str
+
+
+
+                    self.status_available = True                    
+
+                    state = state_writing_results
+                    print(f'[COORDINATOR] Broadcasting global mean to clients 2', flush=True)
+
+                """
                 if len(self.data_incoming) == len(self.clients):
 
                     #print("DBF 590: self.data_incoming: ",self.data_incoming[0])
@@ -215,6 +257,9 @@ class AppLogic:
                     ##local_syn_data_for_global_part_temp = [jsonpickle.decode(data_for_global) for data_for_global in self.data_incoming]
                     local_syn_data_for_global_part = [pd.read_json(jsonpickle.decode(data_for_global),orient="split") for data_for_global in self.data_incoming]
                     #print("DBF590,5: local_syn_data_for_global_part datatype/length: ", type(local_syn_data_for_global_part),"/",len(local_syn_data_for_global_part))
+
+                    print("DBF244.1: is this aggregated (20)? ", local_syn_data_for_global_part)
+
                     print("K") 
                     
                     #pd.read_json(exp_data_unpickled,orient="split") #LR: just reference for pd.read_json, delete later
@@ -227,7 +272,12 @@ class AppLogic:
                     #print("DBF 592: global_syn_data: ", syn_global_data)
                     print("P")
 
-                    self.client.set_syn_global_data(syn_global_data)
+                    #LR: this function is empty the aggregation seems to be when writing file OR
+                    # OR the aggregation happends when local_syn_data_for_global_part = [pd.read_json ...  
+                    # which might not be the case else the console would print full 20 instead of 10 for the client 
+                    #UPDATE this is actually 2 dataframes, hence it is alread aggreagted (no explicit function call needed)
+                    #but currently im splitting it up again before sending, fix this
+                    self.client.set_syn_global_data(syn_global_data)  
                     print("I")
                     # data_to_broadcast = jsonpickle.encode(global_mean)
                     data_to_broadcast = syn_global_data #LR: not jsonpickle because pandasdataframe, if not working this way can convert to string by native pandas method and pickle
@@ -242,7 +292,9 @@ class AppLogic:
                     # print("done pickeling")
                     # #print("exp_data_to_pickle: ", exp_data_to_pickle)
                     
-                    data_to_broadcast = data_to_broadcast[0].to_json(orient="split")
+                    #data_to_broadcast = data_to_broadcast[0].to_json(orient="split")
+                    print("DBF244.2")
+                    data_to_broadcast = data_to_broadcast.to_json(orient="split")
                     data_to_broadcast = jsonpickle.encode(data_to_broadcast)
 
 
@@ -255,6 +307,7 @@ class AppLogic:
                     print("R")
                     state = state_writing_results
                     print(f'[COORDINATOR] Broadcasting global mean to clients', flush=True)
+                """    
 
             if state == state_writing_results:
                 print("Writing results", flush=True)
